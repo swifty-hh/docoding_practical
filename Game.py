@@ -32,10 +32,27 @@ to_y = 0
 # moving speed
 character_speed = 1
 
+# enemy character
+enemy = pygame.image.load("C:/Users/hhj56/Desktop/PythonWorkspace/pygame_basic/enemy.png")
+enemy_size = enemy.get_rect().size 
+enemy_width = enemy_size[0] 
+enemy_height = enemy_size[1] 
+enemy_x_pos = (screen_width / 2) - (enemy_width / 2)
+enemy_y_pos = (screen_height / 2) - (enemy_height / 2)
+
+# font
+game_font = pygame.font.Font(None, 40) # make font(font, size)
+
+# total time
+total_time = 10
+
+# starting time
+start_ticks = pygame.time.get_ticks() # get starting tick
+
 # event loop
 running = True
 while running:
-    dt = clock.tick(144) # setting fps/s
+    dt = clock.tick(30) # setting fps/s
 
 #    print("fps : " + str(clock.get_fps()))
     
@@ -74,11 +91,42 @@ while running:
     elif character_y_pos > screen_height - character_height:
         character_y_pos = screen_height - character_height
 
-    screen.blit(background, (0, 0)) # draw background
+    # rect's information update for collision
+    character_rect = character.get_rect()
+    character_rect.left = character_x_pos
+    character_rect.top = character_y_pos
 
-    screen.blit(character, (character_x_pos, character_y_pos))
+    enemy_rect = enemy.get_rect()
+    enemy_rect.left = enemy_x_pos
+    enemy_rect.top = enemy_y_pos
+
+    #collision check
+    if character_rect.colliderect(enemy_rect):
+        print("Boom!")
+        running = False
+
+    screen.blit(background, (0, 0)) # draw background
+    screen.blit(character, (character_x_pos, character_y_pos)) # draw character
+    screen.blit(enemy, (enemy_x_pos, enemy_y_pos)) # draw enemy
+
+    # timer
+    # calculate passed time
+    elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000 #  1000 divede passed time
+    # \ (ms) to show in seconds(s)
+
+
+    timer = game_font.render(str(float(total_time - elapsed_time)), True, (255, 255, 255))
+    # printng str, True, color of str
+    screen.blit(timer, (10, 10))
+
+    if total_time - elapsed_time <= 0:
+        print("TIME OVER!")
+        running = False
 
     pygame.display.update() # updating display continuosly
+
+# hold
+pygame.time.delay(1500) # hold for 1.5 sec
 
 # end pygame
 pygame.quit
